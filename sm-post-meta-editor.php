@@ -3,9 +3,11 @@
 /**
  * Plugin Name: SmartMoon Post Meta Editor
  * Description: Edit post meta fields easily.
- * Version: 0.0.1-alpha
+ * Version: 0.0.1-beta
  * Author: SmartMoon
  */
+
+ define('SM_POST_META_EDITOR_MAX_LENGTH', 500);
 
  if (!defined('SM_CORE_LOADED')) {
     add_action('admin_notices', function () {
@@ -88,30 +90,23 @@ function sm_post_meta_editor_page_content() {
             </thead>
             <tbody>
                 <?php foreach ($all_postmeta as $postmeta) { ?>
+                    <?php if(strlen($postmeta->meta_value) <= SM_POST_META_EDITOR_MAX_LENGTH) { ?>
                     <tr>
                         <td style="max-width:50px!important;"><?= $postmeta->meta_id ?></td>
                         <td style="max-width:50px!important;"><?= $postmeta->post_id ?></td>
                         <td style="min-width:50px!important;max-width:50px!important;"><?= $postmeta->meta_key ?></td>
                         <td style="max-width:100px!important;"><?= $postmeta->meta_value ?></td>
                         <td style="max-width:600px!important;"> 
-                            <!-- if meta value is array, then make it textarea -->
-                            <?php if (is_array($postmeta->meta_value) || is_object($postmeta->meta_value) || strlen($postmeta->meta_value) > 500) { ?>
-                                <textarea type="text" 
-                                name="postmeta_meta_value[<?= $postmeta->meta_id ?>]" 
-                                id="postmeta_meta_value" 
-                                class="form-control" 
-                                cols="75" rows="10"><?= $postmeta->meta_value ?></textarea>
-                            <!-- otherwise it show input field -->
-                            <?php } else { ?>
+                            <!-- if meta value is array, then make it textarea -->                                                    
                                 <input type="text" 
                                 style="width:600px!important;" 
                                 name="postmeta_meta_value[<?= $postmeta->meta_id ?>]" 
                                 id="postmeta_meta_value" 
                                 class="form-control" 
-                                value="<?= $postmeta->meta_value ?>">
-                            <?php } ?>
+                                value="<?= $postmeta->meta_value ?>">                          
                         </td>
-                    </tr>                                 
+                    </tr>  
+                    <?php } ?>
                 <?php }?>
               </tbody>
               </table> 
@@ -133,6 +128,13 @@ add_action('wp_ajax_sm_post_meta_editor_export_all_postmeta', 'sm_post_meta_edit
 function sm_post_meta_editor_export_all_postmeta() {
     global $wpdb;
     $all_postmeta = $wpdb->get_results("SELECT * FROM {$wpdb->postmeta}");
+
+    //Remove from all_postmeta if length is greater than SM_POST_META_EDITOR_MAX_LENGTH
+    foreach($all_postmeta as $postmeta) {
+        if(strlen($postmeta->meta_value) > SM_POST_META_EDITOR_MAX_LENGTH) {
+            unset($all_postmeta[$postmeta->meta_id]);
+        }
+    }
     
     // convert array to json
     $all_postmeta = json_encode($all_postmeta);
@@ -147,7 +149,6 @@ function sm_post_meta_editor_export_all_postmeta() {
 }
 
 function import_all_postmeta() {
-    // Ensure output is wrapped in admin panel UI
     ?>
     <h1>Post Meta Editor</h1>
             <p>Import All Post Meta</p>
