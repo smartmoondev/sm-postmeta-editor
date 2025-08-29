@@ -3,7 +3,7 @@
 /**
  * Plugin Name: SmartMoon Post Meta Editor
  * Description: Edit post meta fields easily.
- * Version: 0.0.1-gama
+ * Version: 0.0.1-delta
  * Author: SmartMoon
  */
 
@@ -98,7 +98,7 @@ function sm_post_meta_editor_page_content() {
                         <td style="max-width:50px!important;"><?= $postmeta->meta_id ?></td>
                         <td style="max-width:50px!important;"><?= $postmeta->post_id ?></td>
                         <td style="min-width:50px!important;max-width:50px!important;"><?= $postmeta->meta_key ?></td>
-                        <td style="max-width:100px!important;"><?= $postmeta->meta_value ?></td>
+                        <td style="max-width:100px!important;"><?= htmlentities($postmeta->meta_value) ?></td>
                         <td style="max-width:600px!important;"> 
                             <!-- if meta value is array, then make it textarea -->                                                    
                                 <input type="text" 
@@ -106,7 +106,7 @@ function sm_post_meta_editor_page_content() {
                                 name="postmeta_meta_value[<?= $postmeta->meta_id ?>]" 
                                 id="postmeta_meta_value" 
                                 class="form-control" 
-                                value="<?= $postmeta->meta_value ?>">                          
+                                value="<?= htmlentities($postmeta->meta_value) ?>">                          
                         </td>
                     </tr>  
                     <?php } ?>
