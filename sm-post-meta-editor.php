@@ -3,11 +3,14 @@
 /**
  * Plugin Name: SmartMoon Post Meta Editor
  * Description: Edit post meta fields easily.
- * Version: 0.0.1-beta
+ * Version: 0.0.1-gama
  * Author: SmartMoon
  */
 
  define('SM_POST_META_EDITOR_MAX_LENGTH', 500);
+ define('SM_POST_META_EDITOR_UNWANTED_KEYS', 
+    ['_wp_attachment_metadata']
+);
 
  if (!defined('SM_CORE_LOADED')) {
     add_action('admin_notices', function () {
@@ -90,7 +93,7 @@ function sm_post_meta_editor_page_content() {
             </thead>
             <tbody>
                 <?php foreach ($all_postmeta as $postmeta) { ?>
-                    <?php if(strlen($postmeta->meta_value) <= SM_POST_META_EDITOR_MAX_LENGTH) { ?>
+                    <?php if(strlen($postmeta->meta_value) <= SM_POST_META_EDITOR_MAX_LENGTH && !in_array($postmeta->meta_key, SM_POST_META_EDITOR_UNWANTED_KEYS)) { ?>
                     <tr>
                         <td style="max-width:50px!important;"><?= $postmeta->meta_id ?></td>
                         <td style="max-width:50px!important;"><?= $postmeta->post_id ?></td>
@@ -131,7 +134,7 @@ function sm_post_meta_editor_export_all_postmeta() {
 
     //Remove from all_postmeta if length is greater than SM_POST_META_EDITOR_MAX_LENGTH
     foreach($all_postmeta as $postmeta) {
-        if(strlen($postmeta->meta_value) > SM_POST_META_EDITOR_MAX_LENGTH) {
+        if(strlen($postmeta->meta_value) > SM_POST_META_EDITOR_MAX_LENGTH || in_array($postmeta->meta_key, SM_POST_META_EDITOR_UNWANTED_KEYS)) {
             unset($all_postmeta[$postmeta->meta_id]);
         }
     }
